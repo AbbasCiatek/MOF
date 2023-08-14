@@ -48,4 +48,4 @@ jobs:
         if: always()
         with:
           files: |
-            coverage.xml
+            *.xml
