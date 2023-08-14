@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "mof"
-authors = [{name = "Abbas Srour", email = "asrour@ciatek.net"}]
+authors = [{ name = "Abbas Srour", email = "asrour@ciatek.net" }]
 readme = "README.md"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
@@ -35,6 +35,7 @@ test = [
     "mypy >=0.910",
     "coverage >=6.1.1",
     "pytest-cov >=3.0.0",
+    "asgi_lifespan >=2.1.0"
 ]
 
 dev = [
