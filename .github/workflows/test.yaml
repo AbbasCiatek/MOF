@@ -38,17 +38,6 @@ jobs:
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
           -o console_output_style=progress --disable-warnings
-
-  coverage:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
-      pull-requests: write
-      issues: write
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
       - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
