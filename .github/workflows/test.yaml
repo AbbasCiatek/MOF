@@ -1,0 +1,45 @@
+name: test
+
+on:
+  pull_request:
+    branches: [ 'main', 'main-dev' ]
+    types: [opened, synchronize, reopened, labeled, review_requested]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: install dependencies
+        run: ./scripts/install.sh
+
+      - name: Build and Push Container
+        run: |-
+          docker build -t "backend" --file /Dockerfile .
+
+      - name: Run Docker Container
+        run: |-
+          docker run -d -p 8080:8080 backend
+
+      - name: run dependencies
+        run: |
+          echo "setting local env"
+          . ./scripts/set-local-env.sh
+          echo "running dependencies"
+          ./scripts/run-dependencies.sh
+
+      - name: run tests
+        run: ./scripts/test.sh
+
+      - name: docker-build
+        run: ./scripts/docker-build.sh

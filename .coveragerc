@@ -1,0 +1,10 @@
+[run]
+source =
+    src
+    tests
+
+omit =
+    *__init__.py
+    alembic/*
+
+parallel = True

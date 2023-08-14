@@ -1,0 +1,98 @@
+{
+  "user": {
+    "notFound": {
+      "statusCode": 404,
+      "message": "User not found",
+      "code": "error.user.notFound"
+    },
+    "emailExists": {
+      "statusCode": 409,
+      "message": "Email already exists",
+      "code": "error.user.emailExists"
+    },
+    "phoneExists": {
+      "statusCode": 409,
+      "message": "Phone already exists",
+      "code": "error.user.phoneExists"
+    },
+    "invalidPassword": {
+      "statusCode": 400,
+      "message": "Invalid password",
+      "code": "error.user.invalidPassword"
+    }
+  },
+  "auth": {
+    "invalidCredentials": {
+      "statusCode": 400,
+      "message": "Invalid credentials",
+      "code": "error.auth.invalidCredentials"
+    },
+    "expiredToken": {
+      "statusCode": 401,
+      "message": "Token expired",
+      "code": "error.auth.expired"
+    },
+    "invalidToken": {
+      "statusCode": 401,
+      "message": "Invalid token",
+      "code": "error.auth.invalid"
+    },
+    "missingToken": {
+      "statusCode": 401,
+      "message": "Missing token",
+      "code": "error.auth.missing"
+    },
+    "noSession": {
+      "statusCode": 403,
+      "message": "No session",
+      "code": "error.auth.noSession"
+    },
+    "sessionRevoked": {
+      "statusCode": 403,
+      "message": "Session revoked",
+      "code": "error.auth.sessionRevoked"
+    },
+    "deactivated": {
+      "statusCode": 403,
+      "message": "User deactivated",
+      "code": "error.auth.deactivated"
+    },
+    "unauthorized": {
+      "statusCode": 401,
+      "message": "Unauthorized",
+      "code": "error.auth.unauthorized"
+    },
+    "forbidden": {
+      "statusCode": 403,
+      "message": "Forbidden",
+      "code": "error.auth.forbidden"
+    }
+  },
+  "firm": {
+    "notFound": {
+      "statusCode": 404,
+      "message": "Firm not found",
+      "code": "error.firm.notFound"
+    },
+    "nameExists": {
+      "statusCode": 409,
+      "message": "Name already exists",
+      "code": "error.firm.nameExists"
+    },
+    "emailExists": {
+      "statusCode": 409,
+      "message": "Email already exists",
+      "code": "error.firm.emailExists"
+    },
+    "phoneExists": {
+      "statusCode": 409,
+      "message": "Phone already exists",
+      "code": "error.firm.phoneExists"
+    },
+    "mofExists": {
+      "statusCode": 409,
+      "message": "MOF already exists",
+      "code": "error.firm.mofExists"
+    }
+  }
+}
