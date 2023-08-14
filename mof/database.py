@@ -1,5 +1,4 @@
 import sys
-import urllib.parse
 from typing import Optional
 
 from beanie import init_beanie
@@ -11,10 +10,10 @@ from motor.core import (
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from mof.apienv import apienv
-# from mof.auth.models.session_doc import SessionDocument
-# from mof.firm.models.firm_doc import FirmDocument
+from mof.auth.models.session_doc import SessionDocument
+from mof.firm.models.firm_doc import FirmDocument
 from mof.logger import logger
-# from mof.user.models.user_doc import UserDocument
+from mof.user.models.user_doc import UserDocument
 
 async_mongodb_client = None
 
@@ -25,6 +24,7 @@ def get_mongodb_config():
         "password": apienv.DB_PASS,
         "host": apienv.DB_HOST,
         "db": apienv.DB_NAME,
+        "url": apienv.DB_URL,
     }
     return config
 
@@ -33,10 +33,7 @@ def get_async_mongodb_client() -> AgnosticClient:
     global async_mongodb_client
     if async_mongodb_client is None:
         config = get_mongodb_config()
-        host = config["host"]
-        username = urllib.parse.quote_plus(config["username"])
-        password = urllib.parse.quote_plus(config["password"])
-        url = f"mongodb+srv://{username}:{password}@{host}/?retryWrites=true&w=majority&uuidRepresentation=standard"
+        url = config.get("url")
         async_mongodb_client = AsyncIOMotorClient(url)
     return async_mongodb_client
 
@@ -59,8 +56,7 @@ async def start_async_mongodb() -> AgnosticDatabase:
         async_mongodb_database = get_async_mongodb_database()
         await init_beanie(
             database=async_mongodb_database,
-            # document_models=[UserDocument, SessionDocument, FirmDocument],
-            document_models=[]
+            document_models=[UserDocument, SessionDocument, FirmDocument],
         )
         logger.log(0, "started mongodb connection")
         return async_mongodb_database

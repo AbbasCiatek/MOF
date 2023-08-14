@@ -3,13 +3,17 @@ name: test
 on:
   pull_request:
     branches: [ 'main', 'main-dev' ]
-    types: [opened, synchronize, reopened, labeled, review_requested]
+    types: [ opened, synchronize, reopened, labeled, review_requested ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.11 ]
+
     permissions:
-      contents: read
+      contents: write
       id-token: write
       pull-requests: write
       issues: write
@@ -17,29 +21,31 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
         with:
-          fetch-depth: 0
-
-      - name: install dependencies
-        run: ./scripts/install.sh
-
-      - name: Build and Push Container
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
         run: |-
-          docker build -t "backend" --file /Dockerfile .
-
-      - name: Run Docker Container
+          python -m pip install --upgrade pip
+          pip install .
+      - name: Run tests
         run: |-
-          docker run -d -p 8080:8080 backend
+          pytest --cov=mof --cov-report=term-missing --cov-report=xml \
+          -o console_output_style=progress --disable-warnings --cov-fail-under=100 ${@}
 
-      - name: run dependencies
-        run: |
-          echo "setting local env"
-          . ./scripts/set-local-env.sh
-          echo "running dependencies"
-          ./scripts/run-dependencies.sh
-
-      - name: run tests
-        run: ./scripts/test.sh
-
-      - name: docker-build
-        run: ./scripts/docker-build.sh
+  coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Get Cover
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: ./coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}

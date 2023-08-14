@@ -1,0 +1,27 @@
+### Login
+POST http://localhost:8000/api/v1/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "asrour@ciatek.com",
+  "password": "Abbas123$"
+}
+
+### Refresh
+POST http://localhost:8000/api/v1/refresh
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{refreshToken}}
+
+### ME
+GET http://localhost:8000/api/v1/me
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Logout
+POST http://localhost:8000/api/v1/logout
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{refreshToken}}

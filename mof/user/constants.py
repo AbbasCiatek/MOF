@@ -1,0 +1,8 @@
+from enum import Enum
+
+
+class RoleEnum(str, Enum):
+    ADMINISTRATOR = "ADMINISTRATOR"
+    AUDITOR = "AUDITOR"
+    MINISTRY_EMPLOYEE = "MINISTRY_EMPLOYEE"
+    FIRM_EMPLOYEE = "FIRM_EMPLOYEE"

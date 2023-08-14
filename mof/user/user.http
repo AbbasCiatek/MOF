@@ -1,0 +1,39 @@
+### Create User
+POST http://localhost:8000/api/v1/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "Abbas",
+  "lastName": "Srour",
+  "email": "asrour@ciatek.net",
+  "password": "Abbas123$",
+  "role": "ADMINISTRATOR",
+  "phone": "70123456"
+}
+
+### Get Users
+GET http://localhost:8000/api/v1/users
+Content-Type: application/json
+Accept: application/json
+
+
+### GET USER
+GET http://localhost:8000/api/v1/users/64d4e2b8dade19de51235144
+Content-Type: application/json
+Accept: application/json
+
+### Update User
+PUT http://localhost:8000/api/v1/users/64d4e2b8dade19de51235144
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "Abbas",
+  "lastName": "Srour"
+}
+
+### Delete User
+DELETE http://localhost:8000/api/v1/users/64d4e2b8dade19de51235144
+Content-Type: application/json
+Accept: application/json

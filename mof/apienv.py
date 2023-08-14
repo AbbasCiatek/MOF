@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings
 def get_env():
     if "pytest" in "".join(sys.argv):
         return ".env.test"
-    elif os.environ.get("ENV", "development") == "development":
+    elif os.environ.get("ENV", "dev") == "dev":
         return ".env.dev"
     elif os.environ.get("ENV", "test"):
         return ".env.test"
@@ -19,7 +19,7 @@ def get_env():
 class ApiEnv(BaseSettings):
     # General
     Environment: str = Field(
-        "development",
+        "dev",
         env="ENV",
         description="Runtime environment.",
     )
@@ -77,6 +77,11 @@ class ApiEnv(BaseSettings):
         ...,
         env="DB_NAME",
         description="Database name.",
+    )
+    DB_URL: str = Field(
+        ...,
+        env="DB_URL",
+        description="Database url.",
     )
 
     class Config:
