@@ -27,14 +27,17 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Update pip and install flit
         run: |-
           python -m pip install --upgrade pip
-          pip install .
+          pip install flit
+      - name: Install Dependencies
+        run: |-
+          flit install --deps=all --extras=all --symlink
       - name: Run tests
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
-          -o console_output_style=progress --disable-warnings --cov-fail-under=100 ${@}
+          -o console_output_style=progress --disable-warnings --cov-fail-under=100
 
   coverage:
     runs-on: ubuntu-latest
