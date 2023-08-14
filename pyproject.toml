@@ -26,7 +26,9 @@ dependencies = [
     "pydantic_settings >= 2.0.2",
     "pydantic-extra-types >= 2.0.0",
     "phonenumbers >= 8.13.18",
-    "python-jose>= 3.3.0"
+    "python-jose>= 3.3.0",
+    "httpcore >=0.17.3",
+    "httpx >=0.24.1"
 ]
 
 [project.optional-dependencies]
