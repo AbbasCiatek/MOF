@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [ 'main', 'main-dev' ]
     types: [ opened, synchronize, reopened, labeled, review_requested ]
+  workflow_dispatch:
+
 
 jobs:
   test:
