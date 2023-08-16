@@ -9,11 +9,11 @@ def get_env():
     if "pytest" in "".join(sys.argv):
         return ".env.test"
     elif os.environ.get("ENV", "dev") == "dev":
-        return ".env.test"
+        return ".env.dev"
     elif os.environ.get("ENV", "test"):
         return ".env.test"
     else:
-        return ".env.test"
+        return ".env"
 
 
 class ApiEnv(BaseSettings):

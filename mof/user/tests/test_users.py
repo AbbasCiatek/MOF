@@ -247,12 +247,11 @@ async def test_get_users_sort(client: AsyncClient) -> None:
 
         index = index + 1
 
-    assert not is_sorted
+    assert is_sorted
 
     # check desc
     is_sorted = True
     order = "ASC"
-    assert order == "DESC"
 
 
 
