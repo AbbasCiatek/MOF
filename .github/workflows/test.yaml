@@ -37,21 +37,21 @@ jobs:
       - name: Run tests
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
-          -o console_output_style=progress --disable-warnings
+          -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
       - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
           coverageFile: ./coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-      #      - name: Publish Test Results
-      #        uses: EnricoMi/publish-unit-test-result-action@v2
-      #        if: always()
-      #        with:
-      #          files: |
-      #            *.xml
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            test-results.xml
       - name: Test Summary
         uses: test-summary/action@v2
         with:
-          paths: "coverage.xml"
+          paths: "test-results.xml"
         if: always()
 
