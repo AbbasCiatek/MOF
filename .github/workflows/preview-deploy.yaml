@@ -2,7 +2,7 @@ name: Deploy Preview Branch
 
 on:
   pull_request:
-    branches-ignore: [ "main", "main-dev" ]
+    branches: ["main-dev"]
     types: [opened, synchronize, reopened, labeled, closed]
 
 env:
