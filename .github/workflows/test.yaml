@@ -81,7 +81,7 @@ jobs:
       - name: Get Coverage
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
-          -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
+          -o console_output_style=progress --disable-warnings
       - name: Upload Coverage
         uses: orgoro/coverage@v3.1
         with:
