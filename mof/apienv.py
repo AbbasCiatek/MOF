@@ -13,7 +13,7 @@ def get_env():
     elif os.environ.get("ENV", "test"):
         return ".env.test"
     else:
-        return ".env"
+        return ".env.test"
 
 
 class ApiEnv(BaseSettings):
