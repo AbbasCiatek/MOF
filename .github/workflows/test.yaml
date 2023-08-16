@@ -63,3 +63,12 @@ jobs:
           paths: "test-results.xml"
         if: always()
 
+      - name: Surface failing tests
+        if: always()
+        uses: pmeier/pytest-results-action@main
+        with:
+          path: test-results.xml
+          summary: true
+          display-options: fEX
+          fail-on-empty: false
+
