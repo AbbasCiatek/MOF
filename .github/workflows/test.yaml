@@ -65,6 +65,7 @@ jobs:
         with:
           paths: "test-results.xml"
           output: test-summary.md
+          show: "all"
         if: always()
 
       - name: Upload test summary
@@ -74,6 +75,10 @@ jobs:
           path: test-summary.md
         if: always()
 
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          body-path: 'test-summary.md'
 
 #      - name: Publish Test Results
 #        uses: EnricoMi/publish-unit-test-result-action@v2
