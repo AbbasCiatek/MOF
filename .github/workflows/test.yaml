@@ -41,7 +41,7 @@ jobs:
           flit install --deps=all --extras=all --symlink
 
       - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@latest
+        uses: supercharge/mongodb-github-action@1.10.0
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
 
