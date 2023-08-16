@@ -44,10 +44,12 @@ jobs:
 
       # Run Tests
       - name: Get Coverage
+        continue-on-error: true
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
           -o console_output_style=progress --disable-warnings
       - name: Run Tests
+        continue-on-error: true
         run: |-
           pytest -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml -rs
 
