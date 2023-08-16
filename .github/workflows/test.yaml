@@ -57,26 +57,6 @@ jobs:
           name: test-summary
           path: test-summary.md
         if: always()
-      - name: Find Comment
-        uses: peter-evans/find-comment@v2
-        id: fc
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: Made with ❤️ in Cambridge.
-      - name: Create comment
-        if: steps.fc.outputs.comment-id == ''
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body-path: 'test-summary.md'
-      - name: Update comment
-        if: steps.fc.outputs.comment-id != ''
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          body-path: 'test-summary.md'
-          edit-mode: replace
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -97,13 +77,6 @@ jobs:
           summary: true
           display-options: fEX
           fail-on-empty: false
-      - name: Create Falling Tests Comment
-        if: always()
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ env.GITHUB_STEP_SUMMARY }}
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get Coverage
         run: |-
