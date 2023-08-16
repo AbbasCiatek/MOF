@@ -25,26 +25,21 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.9.0
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
-
       - name: Update pip and install flit
         run: |-
           python -m pip install --upgrade pip
           pip install flit
-
       - name: Install Dependencies
         run: |-
           flit install --deps=all --extras=all --symlink
-
       - name: Run Tests
         run: |-
           pytest -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml -rs
@@ -56,29 +51,25 @@ jobs:
           output: test-summary.md
           show: "all"
         if: always()
-
       - name: Upload test summary
         uses: actions/upload-artifact@v3
         with:
           name: test-summary
           path: test-summary.md
         if: always()
-
       - name: Find Comment
         uses: peter-evans/find-comment@v2
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: Build output
-
+          body-includes: Made with ❤️ in Cambridge.
       - name: Create comment
         if: steps.fc.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-path: 'test-summary.md'
-
       - name: Update comment
         if: steps.fc.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v3
@@ -86,17 +77,6 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           body-path: 'test-summary.md'
           edit-mode: replace
-
-      - name: Get Coverage
-        run: |-
-          pytest --cov=mof --cov-report=term-missing --cov-report=xml \
-          -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
-
-      - name: Upload Coverage
-        uses: orgoro/coverage@v3.1
-        with:
-          coverageFile: ./coverage.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -111,8 +91,26 @@ jobs:
       - name: Surface failing tests
         if: always()
         uses: pmeier/pytest-results-action@main
+        id: pytest-results-action
         with:
           path: test-results.xml
           summary: true
           display-options: fEX
           fail-on-empty: false
+      - name: Create Faling Tests Comment
+        if: always()
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.pytest-results-action.outputs.summary }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Coverage
+        run: |-
+          pytest --cov=mof --cov-report=term-missing --cov-report=xml \
+          -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
+      - name: Upload Coverage
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: ./coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
