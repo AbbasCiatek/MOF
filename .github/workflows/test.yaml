@@ -19,6 +19,7 @@ jobs:
       id-token: write
       pull-requests: write
       issues: write
+      checks: write
 
     steps:
       - name: checkout
@@ -49,12 +50,12 @@ jobs:
           coverageFile: ./coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
 
-#      - name: Publish Test Results
-#        uses: EnricoMi/publish-unit-test-result-action@v2
-#        if: always()
-#        with:
-#          files: |
-#            test-results.xml
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            test-results.xml
 
       - name: Test Summary
         uses: test-summary/action@v2
