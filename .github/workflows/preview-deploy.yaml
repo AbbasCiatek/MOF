@@ -2,8 +2,10 @@ name: Deploy Preview Branch
 
 on:
   pull_request:
-    branches: [ "main-dev", "main" ]
+    branches: ["main-dev"]
     types: [opened, synchronize, reopened, labeled, closed]
+  workflow_dispatch:
+
 
 env:
 #  TRIGGER_LABEL: cloudrun-preview
@@ -29,12 +31,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Google Auth
         id: auth
-        uses: 'google-github-actions/auth@v0'
+        uses: google-github-actions/auth@v0
         with:
           credentials_json: '${{ secrets.GCP_SECRET }}'
 
@@ -47,12 +47,27 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}" --file /Dockerfile .
+          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}" --file Dockerfile .
           docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}"
 
-      - name: Preview Cloud Run Deployment
-        uses: knanao/preview-cloudrun@v1
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
         with:
           service: ${{ env.SERVICE }}
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          region: ${{ env.REGION }}
+          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
+          run: |
+            gcloud run deploy ${{ env.PROJECT_ID }} \
+            --image  ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} \
+            --allow-unauthenticated --port 8080 --region ${{ env.REGION }} --platform managed --no-traffic \
+            --tag ${{ github.sha }}-${{ steps.tag.outputs.version }}
+
+      - name: Comment Preview URL in PR
+        uses: mshick/add-pr-comment@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          message: |
+            🍿 Successfully deployed preview revision at https://pr----homepage-12345abcde-ez.a.run.app
+          allow-repeats: false

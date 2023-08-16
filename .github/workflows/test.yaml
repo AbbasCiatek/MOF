@@ -1,4 +1,4 @@
-name: test
+name: Test
 
 on:
   pull_request:
@@ -13,20 +13,27 @@ jobs:
     strategy:
       matrix:
         python-version: [ 3.11 ]
+        mongodb-version: [ 6.0 ]
 
     permissions:
       contents: write
       id-token: write
       pull-requests: write
       issues: write
+      checks: write
 
     steps:
+      # Setup
       - name: checkout
         uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.9.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
       - name: Update pip and install flit
         run: |-
           python -m pip install --upgrade pip
@@ -34,23 +41,58 @@ jobs:
       - name: Install Dependencies
         run: |-
           flit install --deps=all --extras=all --symlink
-      - name: Run tests
+
+      # Run Tests
+      - name: Get Coverage
+        continue-on-error: true
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
           -o console_output_style=progress --disable-warnings
+      - name: Run Tests
+        continue-on-error: true
+        run: |-
+          pytest -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml -rs
 
-  coverage:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
-      pull-requests: write
-      issues: write
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: Get Cover
+      # Append coverage to pr comments
+      - name: Upload Coverage
         uses: orgoro/coverage@v3.1
         with:
           coverageFile: ./coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Generates a test summary in Markdown format Artifact
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "test-results.xml"
+          output: test-summary.md
+          show: "all"
+        if: always()
+      - name: Upload test summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-summary
+          path: test-summary.md
+        if: always()
+
+      # Publish test results as a comment in pr
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            test-results.xml
+          check_run_annotations: all tests, skipped tests
+          report_individual_runs: "true"
+          report_suite_logs: "info"
+
+      # Failed Tests details in Workflow Summary
+      - name: Surface failing tests
+        if: always()
+        uses: pmeier/pytest-results-action@main
+        id: pytest-results-action
+        with:
+          path: test-results.xml
+          summary: true
+          display-options: fEX
+          fail-on-empty: false
