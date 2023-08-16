@@ -9,6 +9,7 @@ env:
 #  TRIGGER_LABEL: cloudrun-preview
   REGISTRY: REGISTRY_NAME
   DOCKERFILE_PATH: DOCKERFILE_PATH
+
   PROJECT_ID: mof-backend
   SERVICE: mof-backend-dev
   GCP_APP_PORT: 8080
@@ -46,7 +47,7 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}" .
+          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}" --file Dockerfile .
           docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}"
 
       - name: Deploy to Cloud Run
