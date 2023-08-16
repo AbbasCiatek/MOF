@@ -41,7 +41,7 @@ jobs:
 
       - name: Run Tests
         run: |-
-          pytest -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
+          pytest -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml -rs
 
       - name: Get Coverage
         run: |-
