@@ -104,12 +104,15 @@ jobs:
         with:
           files: |
             test-results.xml
+          check_run_annotations: all tests, skipped tests
+          report_individual_runs: "true"
+          report_suite_logs: "info"
 
-#      - name: Surface failing tests
-#        if: always()
-#        uses: pmeier/pytest-results-action@main
-#        with:
-#          path: test-results.xml
-#          summary: true
-#          display-options: fEX
-#          fail-on-empty: false
+      - name: Surface failing tests
+        if: always()
+        uses: pmeier/pytest-results-action@main
+        with:
+          path: test-results.xml
+          summary: true
+          display-options: fEX
+          fail-on-empty: false
