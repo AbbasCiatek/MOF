@@ -105,11 +105,11 @@ jobs:
           files: |
             test-results.xml
 
-#      - name: Surface failing tests
-#        if: always()
-#        uses: pmeier/pytest-results-action@main
-#        with:
-#          path: test-results.xml
-#          summary: true
-#          display-options: fEX
-#          fail-on-empty: false
+      - name: Surface failing tests
+        if: always()
+        uses: pmeier/pytest-results-action@main
+        with:
+          path: test-results.xml
+          summary: true
+          display-options: fEX
+          fail-on-empty: false
