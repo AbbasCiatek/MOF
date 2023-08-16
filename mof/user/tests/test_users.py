@@ -12,10 +12,10 @@ from mof.user.tests.data import *
 
 
 def parse_phone(phone: str) -> str:
-    return (phone
-            .replace('tel:', '', 1)
-            .replace('-', ' ', 1)
-            .replace('-', ''))
+    return phone.replace("tel:", "", 1).replace("-", " ", 1).replace("-", "")
+
+
+# hello world
 
 
 @pytest.mark.asyncio
@@ -252,8 +252,6 @@ async def test_get_users_sort(client: AsyncClient) -> None:
     # check desc
     is_sorted = True
     order = "ASC"
-
-
 
 
 # def test_get_user(client: TestClient, user_data: Dict) -> None:
