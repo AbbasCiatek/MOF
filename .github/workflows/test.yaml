@@ -60,25 +60,32 @@ jobs:
           coverageFile: ./coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: |
-            test-results.xml
-
       - name: Test Summary
         uses: test-summary/action@v2
         with:
           paths: "test-results.xml"
         if: always()
 
-      - name: Surface failing tests
-        if: always()
-        uses: pmeier/pytest-results-action@main
+      - name: Upload test summary
+        uses: actions/upload-artifact@v3
         with:
-          path: test-results.xml
-          summary: true
-          display-options: fEX
-          fail-on-empty: false
+          name: test-summary
+          path: test-summary.md
+        if: always()
 
+
+#      - name: Publish Test Results
+#        uses: EnricoMi/publish-unit-test-result-action@v2
+#        if: always()
+#        with:
+#          files: |
+#            test-results.xml
+
+#      - name: Surface failing tests
+#        if: always()
+#        uses: pmeier/pytest-results-action@main
+#        with:
+#          path: test-results.xml
+#          summary: true
+#          display-options: fEX
+#          fail-on-empty: false
