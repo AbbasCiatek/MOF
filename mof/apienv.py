@@ -9,7 +9,7 @@ def get_env():
     if "pytest" in "".join(sys.argv):
         return ".env.test"
     elif os.environ.get("ENV", "dev") == "dev":
-        return ".env.dev"
+        return ".env.test"
     elif os.environ.get("ENV", "test"):
         return ".env.test"
     else:

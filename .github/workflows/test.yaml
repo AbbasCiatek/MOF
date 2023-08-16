@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ 3.11 ]
+        mongodb-version: [ 6.0 ]
 
     permissions:
       contents: write
@@ -38,6 +39,11 @@ jobs:
       - name: Install Dependencies
         run: |-
           flit install --deps=all --extras=all --symlink
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
 
       - name: Run Tests
         run: |-
