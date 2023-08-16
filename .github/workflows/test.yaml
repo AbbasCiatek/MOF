@@ -39,7 +39,11 @@ jobs:
         run: |-
           flit install --deps=all --extras=all --symlink
 
-      - name: Run tests
+      - name: Run Tests
+        run: |-
+          pytest -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
+
+      - name: Get Coverage
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
           -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
