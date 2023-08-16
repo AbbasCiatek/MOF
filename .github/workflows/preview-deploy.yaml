@@ -9,7 +9,6 @@ env:
 #  TRIGGER_LABEL: cloudrun-preview
   REGISTRY: REGISTRY_NAME
   DOCKERFILE_PATH: DOCKERFILE_PATH
-
   PROJECT_ID: mof-backend
   SERVICE: mof-backend-dev
   GCP_APP_PORT: 8080
