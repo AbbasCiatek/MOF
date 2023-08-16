@@ -23,32 +23,39 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Update pip and install flit
         run: |-
           python -m pip install --upgrade pip
           pip install flit
+
       - name: Install Dependencies
         run: |-
           flit install --deps=all --extras=all --symlink
+
       - name: Run tests
         run: |-
           pytest --cov=mof --cov-report=term-missing --cov-report=xml \
           -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml
+
       - name: Get Cover
         uses: orgoro/coverage@v3.1
         with:
           coverageFile: ./coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: |
-            test-results.xml
+
+#      - name: Publish Test Results
+#        uses: EnricoMi/publish-unit-test-result-action@v2
+#        if: always()
+#        with:
+#          files: |
+#            test-results.xml
+
       - name: Test Summary
         uses: test-summary/action@v2
         with:
