@@ -23,6 +23,7 @@ jobs:
       checks: write
 
     steps:
+      # Setup
       - name: checkout
         uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -40,10 +41,24 @@ jobs:
       - name: Install Dependencies
         run: |-
           flit install --deps=all --extras=all --symlink
+
+      # Run Tests
+      - name: Get Coverage
+        run: |-
+          pytest --cov=mof --cov-report=term-missing --cov-report=xml \
+          -o console_output_style=progress --disable-warnings
       - name: Run Tests
         run: |-
           pytest -o console_output_style=progress --disable-warnings --junit-xml=test-results.xml -rs
 
+      # Append coverage to pr comments
+      - name: Upload Coverage
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: ./coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Generates a test summary in Markdown format Artifact
       - name: Test Summary
         uses: test-summary/action@v2
         with:
@@ -58,6 +73,7 @@ jobs:
           path: test-summary.md
         if: always()
 
+      # Publish test results as a comment in pr
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
@@ -68,6 +84,7 @@ jobs:
           report_individual_runs: "true"
           report_suite_logs: "info"
 
+      # Failed Tests details in Workflow Summary
       - name: Surface failing tests
         if: always()
         uses: pmeier/pytest-results-action@main
@@ -77,13 +94,3 @@ jobs:
           summary: true
           display-options: fEX
           fail-on-empty: false
-
-      - name: Get Coverage
-        run: |-
-          pytest --cov=mof --cov-report=term-missing --cov-report=xml \
-          -o console_output_style=progress --disable-warnings
-      - name: Upload Coverage
-        uses: orgoro/coverage@v3.1
-        with:
-          coverageFile: ./coverage.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
