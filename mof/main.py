@@ -10,6 +10,7 @@ from mof import __project_id__, __version__
 from mof.database import start_async_mongodb
 from mof.exceptions import APIException, api_exception_handler
 from mof.routes import get_routes
+from mof.apienv import apienv
 
 os.environ["TZ"] = "UTC"
 
@@ -35,6 +36,7 @@ async def add_process_time_header(request: Request, call_next: Callable) -> Any:
 
 @api.on_event("startup")
 async def startup_event():
+    print(apienv)
     db = await start_async_mongodb()
     api.db = db
 
