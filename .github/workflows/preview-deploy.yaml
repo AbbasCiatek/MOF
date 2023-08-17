@@ -44,7 +44,9 @@ jobs:
 
       - name: Unique Tag
         id: uniqTag
-        run: echo "UNIQ_TAG=$(date +%s | sha256sum | base64 | head -c 6 ; echo)" >> $GITHUB_ENV
+        run: |
+          tag=$(date +%s | sha256sum | base64 | head -c 6 ; echo)
+          echo "UNIQ_TAG=a${tag//-/}" >> $GITHUB_ENV
 
       - name: Build and Push Container
         run: |-
