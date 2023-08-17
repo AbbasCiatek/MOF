@@ -17,7 +17,6 @@ env:
 
 jobs:
   preview:
-#    if: ${{ contains(github.event.pull_request.labels.*.name, env.TRIGGER_LABEL) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,18 +37,18 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker "${{ env.GAR_LOCATION }}-docker.pkg.dev" --quiet
 
-      - name: Git Tags
-        id: tag
-        run: echo version=$(git describe --tags --always --dirty --abbrev=7) >> $GITHUB_OUTPUT
-
       - name: Short Commit Hash
         id: commit
         run: echo "SHORT_COMMIT=a${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      - name: Resource Name
+        id: resource
+        run: echo "RESOURCE_NAME=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ env.SHORT_COMMIT }}" >> $GITHUB_ENV
+
       - name: Build and Push Container
         run: |-
-          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ env.SHORT_COMMIT }}" --file Dockerfile .
-          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ env.SHORT_COMMIT }}"
+          docker build -t "${{ env.RESOURCE_NAME }}" --file Dockerfile .
+          docker push "${{ env.RESOURCE_NAME }}"
 
       - name: Deploy to Cloud Run
         id: deploy
@@ -57,11 +56,11 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ env.SHORT_COMMIT }}
+          image: ${{ env.RESOURCE_NAME }}
           tag: ${{ env.SHORT_COMMIT }}
           run: |
             gcloud run deploy ${{ env.PROJECT_ID }} \
-            --image  ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ env.SHORT_COMMIT }} \
+            --image ${{ env.RESOURCE_NAME }} \
             --allow-unauthenticated --port 8080 --region ${{ env.REGION }} --platform managed --no-traffic \
             --tag ${{ env.SHORT_COMMIT }}
 
