@@ -6,4 +6,4 @@ COPY . .
 
 RUN pip install .
 
-CMD gunicorn mof.main:api -c mof/gunicorn_config.py
+CMD exec gunicorn mof.main:api -c mof/gunicorn_config.py
