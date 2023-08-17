@@ -6,35 +6,44 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: mof-backend
+  PROJECT_ID: mof-forms
   SERVICE: mof-backend-dev
-  REGION: europe-west1
   GCP_APP_PORT: 8080
+  REGION: europe-west1
   GAR_LOCATION: europe-west1
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     permissions:
       contents: 'read'
       id-token: 'write'
-    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Google Auth
         id: auth
-        uses: 'google-github-actions/auth@v0'
+        uses: google-github-actions/auth@v0
         with:
           credentials_json: '${{ secrets.GCP_SECRET }}'
 
       - name: Configure Docker
-        run: gcloud auth configure-docker --quiet
+        run: gcloud auth configure-docker "${{ env.GAR_LOCATION }}-docker.pkg.dev" --quiet
+
+      - name: Short Commit Hash
+        id: commit
+        run: echo "SHORT_COMMIT=a${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Resource Name
+        id: resource
+        run: echo "RESOURCE_NAME=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ env.SHORT_COMMIT }}" >> $GITHUB_ENV
 
       - name: Build and Push Container
         run: |-
-          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}" --file /Dockerfile .
-          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+          docker build -t "${{ env.RESOURCE_NAME }}" --file Dockerfile .
+          docker push "${{ env.RESOURCE_NAME }}"
 
       - name: Deploy to Cloud Run
         id: deploy
@@ -42,8 +51,11 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
-          run: gcloud run deploy ${{ env.PROJECT_ID }} --image  ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }} --allow-unauthenticated --port 8080 --region ${{ env.REGION }} --platform managed
+          image: ${{ env.RESOURCE_NAME }}
+          run: |
+            gcloud run deploy ${{ env.PROJECT_ID }} \
+            --image ${{ env.RESOURCE_NAME }} \
+            --allow-unauthenticated --port 8080 --region ${{ env.REGION }} --platform managed
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}

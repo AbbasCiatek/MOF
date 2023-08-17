@@ -2,13 +2,12 @@ name: Deploy Preview Branch
 
 on:
   pull_request:
-    branches: ["main-dev"]
-    types: [opened, synchronize, reopened, labeled, closed]
+    branches: [ "main-dev" ]
+    types: [ opened, synchronize, reopened, labeled, closed ]
   workflow_dispatch:
 
 
 env:
-#  TRIGGER_LABEL: cloudrun-preview
   PROJECT_ID: mof-forms
   SERVICE: mof-backend-preview
   GCP_APP_PORT: 8080
@@ -90,3 +89,6 @@ jobs:
           body: |
             🍿 Successfully deployed preview revision at https://${{ env.SHORT_COMMIT }}---mof-backend-preview-kez5lxekba-ew.a.run.app 🍿
             Revision Number: ${{ env.SHORT_COMMIT }}
+
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
