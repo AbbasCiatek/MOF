@@ -44,7 +44,7 @@ jobs:
 
       - name: Short Commit Hash
         id: commit
-        run: echo "SHORT_COMMIT=${GITHUB_SHA::10}-" >> $GITHUB_ENV
+        run: echo "SHORT_COMMIT=${GITHUB_SHA::10}" >> $GITHUB_ENV
 
       - name: Build and Push Container
         run: |-
