@@ -66,5 +66,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           message: |
-            🍿 Successfully deployed preview revision at https://pr----homepage-12345abcde-ez.a.run.app
+            🍿 Successfully deployed preview revision at https://${{ github.sha }}-${{ steps.tag.outputs.version }}----mof-backend-preview-kez5lxekba-ew.a.run.app
           allow-repeats: false
