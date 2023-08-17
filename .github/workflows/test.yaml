@@ -42,7 +42,7 @@ jobs:
         run: |-
           flit install --deps=all --extras=all --symlink
 
-      # Run Tests
+      # Run Tests And Coverage
       - name: Get Coverage
         continue-on-error: true
         run: |-

@@ -42,6 +42,10 @@ jobs:
         id: tag
         run: echo version=$(git describe --tags --always --dirty --abbrev=7) >> $GITHUB_OUTPUT
 
+      - name: Unique Tag
+        id: uniqTag
+        run: echo "UNIQ_TAG=$(date +%s | sha256sum | base64 | head -c 6 ; echo)" >> $GITHUB_ENV
+
       - name: Build and Push Container
         run: |-
           docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}" --file Dockerfile .
@@ -54,18 +58,36 @@ jobs:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}
-          tag: ${{ github.sha }}-${{ steps.tag.outputs.version }}
+          tag: ${{ env.UNIQ_TAG }}
           run: |
             gcloud run deploy ${{ env.PROJECT_ID }} \
             --image  ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }} \
             --allow-unauthenticated --port 8080 --region ${{ env.REGION }} --platform managed --no-traffic \
-            --tag ${{ github.sha }}-${{ steps.tag.outputs.version }}
+            --tag ${{ env.UNIQ_TAG }}
 
-      - name: Comment Preview URL in PR
-        uses: mshick/add-pr-comment@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: find-revsion-number
         with:
-          message: |
-            🍿 Successfully deployed preview revision at https://${{ github.sha }}-${{ steps.tag.outputs.version }}----mof-backend-preview-kez5lxekba-ew.a.run.app
-          allow-repeats: false
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Revision Number
+
+      - name: Create comment
+        if: steps.fc.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🍿 Successfully deployed preview revision at https://${{ env.UNIQ_TAG }}---mof-backend-preview-kez5lxekba-ew.a.run.app 🍿
+            Revision Number: ${{ steps.find-revsion-number.outputs.comment-id }}
+
+      - name: Update comment
+        if: steps.fc.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: append
+          body: |
+            🍿 Successfully deployed preview revision at https://${{ env.UNIQ_TAG }}---mof-backend-preview-kez5lxekba-ew.a.run.app 🍿
+            Revision Number: ${{ steps.find-revsion-number.outputs.comment-id }}
