@@ -34,6 +34,7 @@ def get_async_mongodb_client() -> AgnosticClient:
     if async_mongodb_client is None:
         config = get_mongodb_config()
         url = config.get("url")
+        print(f"Connecting to mongodb at {url}")
         async_mongodb_client = AsyncIOMotorClient(url)
     return async_mongodb_client
 

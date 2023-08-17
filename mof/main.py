@@ -36,7 +36,6 @@ async def add_process_time_header(request: Request, call_next: Callable) -> Any:
 
 @api.on_event("startup")
 async def startup_event():
-    print(apienv)
     db = await start_async_mongodb()
     api.db = db
 
