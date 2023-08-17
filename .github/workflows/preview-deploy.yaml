@@ -54,6 +54,7 @@ jobs:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}
+          tag: ${{ github.sha }}-${{ steps.tag.outputs.version }}
           run: |
             gcloud run deploy ${{ env.PROJECT_ID }} \
             --image  ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }} \
