@@ -42,11 +42,9 @@ jobs:
         id: tag
         run: echo version=$(git describe --tags --always --dirty --abbrev=7) >> $GITHUB_OUTPUT
 
-      - name: Unique Tag
-        id: uniqTag
-        run: |
-          tag=$(date +%s | sha256sum | base64 | head -c 6 ; echo)
-          echo "UNIQ_TAG=a${tag//-/}" >> $GITHUB_ENV
+      - name: Short Commit Hash
+        id: commit
+        run: echo "SHORT_COMMIT=${GITHUB_SHA::10}" >> $GITHUB_ENV
 
       - name: Build and Push Container
         run: |-
@@ -60,12 +58,12 @@ jobs:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }}
-          tag: ${{ env.UNIQ_TAG }}
+          tag: ${{ env.SHORT_COMMIT }}
           run: |
             gcloud run deploy ${{ env.PROJECT_ID }} \
             --image  ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}-${{ steps.tag.outputs.version }} \
             --allow-unauthenticated --port 8080 --region ${{ env.REGION }} --platform managed --no-traffic \
-            --tag ${{ env.UNIQ_TAG }}
+            --tag ${{ env.SHORT_COMMIT }}
 
       - name: Find Comment
         uses: peter-evans/find-comment@v2
@@ -73,7 +71,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: Revision Number
+          body-includes: Revision For
 
       - name: Create comment
         if: steps.fc.outputs.comment-id == ''
@@ -81,8 +79,8 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            🍿 Successfully deployed preview revision at https://${{ env.UNIQ_TAG }}---mof-backend-preview-kez5lxekba-ew.a.run.app 🍿
-            Revision Number: ${{ steps.find-revsion-number.outputs.comment-id }}
+            🍿 Successfully deployed preview revision at https://${{ env.SHORT_COMMIT }}---mof-backend-preview-kez5lxekba-ew.a.run.app 🍿
+            Revision For: ${{ env.SHORT_COMMIT }}
 
       - name: Update comment
         if: steps.fc.outputs.comment-id != ''
@@ -91,5 +89,5 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           edit-mode: append
           body: |
-            🍿 Successfully deployed preview revision at https://${{ env.UNIQ_TAG }}---mof-backend-preview-kez5lxekba-ew.a.run.app 🍿
-            Revision Number: ${{ steps.find-revsion-number.outputs.comment-id }}
+            🍿 Successfully deployed preview revision at https://${{ env.SHORT_COMMIT }}---mof-backend-preview-kez5lxekba-ew.a.run.app 🍿
+            Revision Number: ${{ env.SHORT_COMMIT }}
