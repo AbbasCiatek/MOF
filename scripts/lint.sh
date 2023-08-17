@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-mypy cloudrunfastapi
-flake8 cloudrunfastapi tests
-black cloudrunfastapi tests --check
-isort cloudrunfastapi tests scripts --check-only
+mypy mof
+flake8 mof
+black mof --check
+isort mof --check-only
