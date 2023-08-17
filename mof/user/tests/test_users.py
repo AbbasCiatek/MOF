@@ -12,11 +12,10 @@ from mof.user.tests.data import *
 
 
 def parse_phone(phone: str) -> str:
-    return phone.replace("tel:", "", 1).replace("-", " ", 1).replace("-", "")
-
-
-# hello world
-
+    return (phone
+            .replace('tel:', '', 1)
+            .replace('-', ' ', 1)
+            .replace('-', ''))
 
 @pytest.mark.asyncio
 async def test_create_user(client: AsyncClient) -> None:
