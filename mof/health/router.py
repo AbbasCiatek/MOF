@@ -27,3 +27,13 @@ def readiness() -> HealthcheckResponse:
     return HealthcheckResponse(
         message=message, version=__version__, time=datetime.now()
     )
+
+@router.get("/health/ready", response_model=HealthcheckResponse, tags=["health"])
+def ready() -> HealthcheckResponse:
+    message = "We're ready."
+    time = datetime.now()
+    logger.info(msg=message, extra={"version": __version__, "time": time})
+    return HealthcheckResponse(
+        message=message, version=__version__, time=datetime.now()
+    )
+
