@@ -17,7 +17,6 @@ def parse_phone(phone: str) -> str:
             .replace('-', ' ', 1)
             .replace('-', ''))
 
-
 @pytest.mark.asyncio
 async def test_create_user(client: AsyncClient) -> None:
     _user_data = user_data[0].copy()
@@ -252,8 +251,6 @@ async def test_get_users_sort(client: AsyncClient) -> None:
     # check desc
     is_sorted = True
     order = "ASC"
-
-
 
 
 # def test_get_user(client: TestClient, user_data: Dict) -> None:
